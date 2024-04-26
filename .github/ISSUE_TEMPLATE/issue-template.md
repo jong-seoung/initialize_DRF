@@ -7,11 +7,14 @@ assignees: ''
 
 ---
 
-## 이슈 내용
-> 이슈 내용 요약 설명
+## 📝 이슈 내용
+> 게시글 관련 CURD API 구현하기 
+<br>
 
-## ✅ ToDoList
-- [ ] TODO A
-- [ ] TODO B
-- [ ] TODO C
-- [ ] TODO CD
+## ✔️ ToDoList
+- [ ] Create
+- [ ] List (페이지네이션 추가하기)
+- [ ] Detail
+- [ ] Patch
+- [ ] Put
+- [ ] Delete
