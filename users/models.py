@@ -4,6 +4,7 @@ from django.db import models
 from core.models import TimeStampedModel
 from users.managers import UserManager
 
+
 class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, max_length=255)
     name = models.CharField(max_length=30, blank=True, null=True)
@@ -19,4 +20,4 @@ class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     class Meta:
-        db_table = 'users'
+        db_table = "users"
