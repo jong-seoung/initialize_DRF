@@ -119,7 +119,10 @@ STATIC_URL = "static/"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    ),
+    "DEFAULT_RENDERER_CLASSES": [
+        'core.renderers.CustomRenderer',
+    ]
 }
 
 # djangorestframework-simplejwt
