@@ -121,8 +121,8 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_RENDERER_CLASSES": [
-        'core.renderers.CustomRenderer',
-    ]
+        "core.renderers.CustomRenderer",
+    ],
 }
 
 # djangorestframework-simplejwt
