@@ -120,9 +120,11 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_RENDERER_CLASSES": [
-        "core.renderers.CustomRenderer",
-    ],
+    # Response class include renderer method
+    # "DEFAULT_RENDERER_CLASSES": [
+    #     "core.renderers.CustomRenderer",
+    # ],
+    "EXCEPTION_HANDLER": "core.exceptions.custom_exception_handler",
 }
 
 # djangorestframework-simplejwt
