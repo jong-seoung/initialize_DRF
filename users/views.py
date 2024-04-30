@@ -11,15 +11,18 @@ from rest_framework import status
 from .serializers.register_serializers import RegisterSerializer
 from .serializers.login_serializers import LoginSerializer
 
+
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
 
+
 class LoginView(APIView):
     serializer_class = LoginSerializer
+
     def post(self, request: Request):
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+        email = request.POST.get("email")
+        password = request.POST.get("password")
 
         try:
             user = User.objects.get(email=email)
@@ -33,6 +36,11 @@ class LoginView(APIView):
                 )
                 return res
             else:
-                return Response({'message': 'Password not Match'}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(
+                    {"message": "Password not Match"},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
         except User.DoesNotExist:
-                return Response({'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "User not found"}, status=status.HTTP_404_NOT_FOUND
+            )

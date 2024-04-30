@@ -6,6 +6,7 @@ from rest_framework import serializers
 
 from users.models import User
 
+
 class TokenResponseSerializer(serializers.Serializer):
     access_token = serializers.CharField()
     refresh_token = serializers.CharField()
@@ -36,6 +37,7 @@ class TokenResponseSerializer(serializers.Serializer):
                 "refresh": self.get_refresh_token(),
             },
         }
+
 
 def get_user_id(request):
     auth_header = request.headers.get("Authorization")
