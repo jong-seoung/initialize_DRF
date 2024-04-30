@@ -2,19 +2,30 @@ from django.contrib.auth.hashers import check_password
 
 from core.tokens import TokenResponseSerializer
 from users.models import User
-from rest_framework import generics
 from rest_framework.request import Request
 from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
+
+from core.constants import SystemCodeManager
+from core.exceptions import raise_exception
+from core.responses import Response
 
 from .serializers.register_serializers import RegisterSerializer
 from .serializers.login_serializers import LoginSerializer
 
 
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
+class RegisterView(APIView):
     serializer_class = RegisterSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+
+        if not serializer.is_valid():
+            raise_exception(
+                code=SystemCodeManager.get_message("base_code", "INVALID_FORMAT")
+            )
+
+        serializer.save()
+        return Response(data=serializer.data)
 
 
 class LoginView(APIView):
@@ -29,18 +40,12 @@ class LoginView(APIView):
 
             if check_password(password, user.password):
                 serializer = TokenResponseSerializer(user)
-                data = serializer.to_representation(serializer)
-                res = Response(
-                    data,
-                    status=status.HTTP_200_OK,
-                )
-                return res
+                return Response(data=serializer.to_representation(serializer))
             else:
-                return Response(
-                    {"message": "Password not Match"},
-                    status=status.HTTP_401_UNAUTHORIZED,
+                raise raise_exception(
+                    code=SystemCodeManager.get_message("auth_code", "USER_INVALID_PW")
                 )
         except User.DoesNotExist:
-            return Response(
-                {"message": "User not found"}, status=status.HTTP_404_NOT_FOUND
+            raise raise_exception(
+                code=SystemCodeManager.get_message("auth_code", "USER_NOT_FOUND")
             )

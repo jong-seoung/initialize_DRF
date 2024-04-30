@@ -1,41 +1,31 @@
-from django.contrib.auth.password_validation import validate_password
-
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
+
+from core.constants import SystemCodeManager
+from core.exceptions import raise_exception
 
 from users.models import User
 
 
-class RegisterSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.Serializer):
+
     email = serializers.EmailField(
-        required=True, validators=[UniqueValidator(queryset=User.objects.all())]
+        max_length=255, required=True, write_only=True, label="[Input]이메일"
     )
     password = serializers.CharField(
-        write_only=True,
-        required=True,
-        validators=[validate_password],
-    )
-    password2 = serializers.CharField(
-        write_only=True,
-        required=True,
+        max_length=128, required=True, write_only=True, label="[Input]패스워드"
     )
 
-    class Meta:
-        model = User
-        fields = ["nickname", "email", "name", "password", "password2"]
-
-    def validate(self, attrs):
-        if attrs["password"] != attrs["password2"]:
-            raise serializers.ValidationError(
-                {"password": "Password fields didn't match."}
+    def validate_email(self, data):
+        if User.objects.filter(email=data).exists():
+            raise_exception(
+                code=SystemCodeManager.get_message("auth_code", "EMAIL_ALREADY")
             )
-        return super().validate(attrs)
+        return data
 
     def create(self, validated_data):
-        user = User.objects.create_user(
-            email=validated_data["email"],
-            nickname=validated_data["nickname"],
-            name=validated_data["name"],
-            password=validated_data["password"],
-        )
+        email = validated_data["email"]
+        password = validated_data["password"]
+
+        user = User.objects.create_user(email=email, password=password)
+
         return user
