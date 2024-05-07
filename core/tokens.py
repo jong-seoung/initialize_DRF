@@ -1,10 +1,15 @@
 from django.utils.translation import gettext_lazy as _
 
+from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 
+from core.constants import SystemCodeManager
+from core.exceptions import raise_exception
+
 from users.models import User
+
 
 class TokenResponseSerializer(serializers.Serializer):
     access_token = serializers.CharField()
@@ -37,10 +42,26 @@ class TokenResponseSerializer(serializers.Serializer):
             },
         }
 
+
 def get_user_id(request):
-    auth_header = request.headers.get("Authorization")
-    access_tokne = auth_header.split(" ")[1]
-    decoded = AccessToken(access_tokne)
-    user_id = decoded["user_id"]
-    user_instance = User.objects.get(id=user_id)
-    return user_instance
+    try:
+        auth_header = request.headers.get("Authorization")
+        access_token = auth_header.split(" ")[1]
+        decoded = AccessToken(access_token)
+        user_id = decoded["user_id"]
+    except InvalidToken:
+        raise_exception(
+            code=SystemCodeManager.get_message("auth_code", "TOKEN_INVALID")
+        )
+    except IndexError:
+        raise_exception(
+            code=SystemCodeManager.get_message("auth_code", "TOKEN_INVALID")
+        )
+
+    try:
+        user = User.objects.get(id=user_id)
+        return user
+    except User.DoesNotExist:
+        raise_exception(
+            code=SystemCodeManager.get_message("auth_code", "USER_NOT_FOUND")
+        )

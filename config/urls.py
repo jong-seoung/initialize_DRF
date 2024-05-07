@@ -15,10 +15,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
+
 from django.contrib import admin
 from django.urls import path, include
+
+from config.swagger import get_swagger_urls
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("users/", include("users.urls")),
+    path("", include("boards.urls")),
 ]
+
+if settings.DEBUG:
+    urlpatterns += get_swagger_urls()

@@ -38,8 +38,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    "drf_yasg",
     "core",
     "users",
+    "boards",
 ]
 
 MIDDLEWARE = [
@@ -119,7 +121,13 @@ STATIC_URL = "static/"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    ),
+    # Response class include renderer method
+    # "DEFAULT_RENDERER_CLASSES": [
+    #     "core.renderers.CustomRenderer",
+    # ],
+    "EXCEPTION_HANDLER": "core.exceptions.custom_exception_handler",
+    "DEFAULT_PAGINATION_CLASS": "core.paginations.CustomPagination",
 }
 
 # djangorestframework-simplejwt
