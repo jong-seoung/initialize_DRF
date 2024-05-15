@@ -1,12 +1,11 @@
 from django.contrib.auth.hashers import check_password
 
-from core.tokens import TokenResponseSerializer
+from core.tokens import CustomJWTAuthentication
 from users.models import User
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from core.constants import SystemCodeManager
-from core.exceptions import raise_exception
+from core.exceptions.service_exceptions import *
 from core.responses import Response
 
 from .serializers.register_serializers import RegisterSerializer
@@ -20,9 +19,7 @@ class RegisterView(APIView):
         serializer = self.serializer_class(data=request.data)
 
         if not serializer.is_valid():
-            raise_exception(
-                code=SystemCodeManager.get_message("base_code", "INVALID_FORMAT")
-            )
+            raise InvalidRequest
 
         serializer.save()
         return Response(data=serializer.data)
@@ -39,13 +36,10 @@ class LoginView(APIView):
             user = User.objects.get(email=email)
 
             if check_password(password, user.password):
-                serializer = TokenResponseSerializer(user)
+                serializer = CustomJWTAuthentication().get_user(user)
                 return Response(data=serializer.to_representation(serializer))
             else:
-                raise raise_exception(
-                    code=SystemCodeManager.get_message("auth_code", "USER_INVALID_PW")
-                )
+                raise UserPasswordInvalid
+
         except User.DoesNotExist:
-            raise raise_exception(
-                code=SystemCodeManager.get_message("auth_code", "USER_NOT_FOUND")
-            )
+            raise UserNotFound

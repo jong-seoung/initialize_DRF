@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
-from core.constants import SystemCodeManager
-from core.exceptions import raise_exception
+from core.exceptions.service_exceptions import *
 
 from users.models import User
 
@@ -17,9 +16,7 @@ class RegisterSerializer(serializers.Serializer):
 
     def validate_email(self, data):
         if User.objects.filter(email=data).exists():
-            raise_exception(
-                code=SystemCodeManager.get_message("auth_code", "EMAIL_ALREADY")
-            )
+            raise UserAlreadyExists
         return data
 
     def create(self, validated_data):
