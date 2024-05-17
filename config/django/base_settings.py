@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "drf_yasg",
     "core",
-    "users",
-    "boards",
+    "api.models.users",
+    "api.models.boards",
 ]
 
 MIDDLEWARE = [

@@ -3,8 +3,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 
 from core.paginations import CustomPagination
-from boards.serializers import boardsSerializers
-from boards.models import Board
+from api.versions.v1.boards.serializers import boardsSerializers
+from api.models.boards.models import Board
 
 
 class boardsViewsets(viewsets.ModelViewSet):
