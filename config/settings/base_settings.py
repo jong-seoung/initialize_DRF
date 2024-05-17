@@ -126,7 +126,6 @@ REST_FRAMEWORK = {
     # "DEFAULT_RENDERER_CLASSES": [
     #     "core.renderers.CustomRenderer",
     # ],
-    "EXCEPTION_HANDLER": "core.exceptions.custom_exception_handler",
     "DEFAULT_PAGINATION_CLASS": "core.paginations.CustomPagination",
 }
 

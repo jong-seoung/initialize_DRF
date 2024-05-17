@@ -1,67 +1,48 @@
-from django.utils.translation import gettext_lazy as _
-
-from rest_framework_simplejwt.exceptions import InvalidToken
-from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework import serializers
-
-from core.constants import SystemCodeManager
-from core.exceptions import raise_exception
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import User
+from core.exceptions.service_exceptions import *
 
 
-class TokenResponseSerializer(serializers.Serializer):
-    access_token = serializers.CharField()
-    refresh_token = serializers.CharField()
+class CustomJWTAuthentication(JWTAuthentication):
+    def authenticate(self, request):
+        header = self.get_header(request)
+        if header is None:
+            return None
+        raw_token = self.get_raw_token(header)
+        if raw_token is None:
+            raise  JWTOutstandingNotFound
 
-    def __init__(self, user, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.token = TokenObtainPairSerializer.get_token(user)
-        self.user = user
+        validated_token = self.get_validated_token(raw_token)
+        user = self.get_user(validated_token)
+        return user, None
 
-    def get_access_token(self):
-        return str(self.token.access_token)
+    def get_user(self, validated_token):
+        try:
+            user_id = validated_token["user_id"]
+            user = User.objects.get(id=user_id)
+            if not user.is_active:
+                raise UserIsNotAuthorized
+            return user
+        except User.DoesNotExist:
+            raise UserNotFound
 
-    def get_refresh_token(self):
-        return str(self.token)
-
-    def to_representation(self, instance):
-        nickname = self.user.nickname
-        if nickname is None:
-            message = "Please set a nickname"
-        else:
-            message = nickname
-
+    @staticmethod
+    def create_token(user):
+        refresh = RefreshToken.for_user(user)
         return {
-            "message": message,
-            "token": {
-                "email": self.user.email,
-                "access": self.get_access_token(),
-                "refresh": self.get_refresh_token(),
-            },
+            "refresh_token": str(refresh),
+            "access_token": str(refresh.access_token),
         }
 
-
-def get_user_id(request):
-    try:
-        auth_header = request.headers.get("Authorization")
-        access_token = auth_header.split(" ")[1]
-        decoded = AccessToken(access_token)
-        user_id = decoded["user_id"]
-    except InvalidToken:
-        raise_exception(
-            code=SystemCodeManager.get_message("auth_code", "TOKEN_INVALID")
-        )
-    except IndexError:
-        raise_exception(
-            code=SystemCodeManager.get_message("auth_code", "TOKEN_INVALID")
-        )
-
-    try:
-        user = User.objects.get(id=user_id)
-        return user
-    except User.DoesNotExist:
-        raise_exception(
-            code=SystemCodeManager.get_message("auth_code", "USER_NOT_FOUND")
-        )
+    def token_vaild(self, token):
+        try:
+            refresh = RefreshToken(token)
+            user_id = refresh["user_id"]
+            user = User.objects.get(id=user_id)
+            if not user.is_active:
+                raise UserIsNotAuthorized
+            return user
+        except User.DoesNotExist:
+            raise UserNotFound

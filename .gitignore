@@ -4,3 +4,5 @@ __pycache__/
 db.sqlite3
 .DS_Store
 */migrations/
+.initialize_django_env/
+.pre-commit-config.yaml
