@@ -8,15 +8,18 @@ from drf_yasg.generators import OpenAPISchemaGenerator
 class BothHttpAndHttpsSchemaGenerator(OpenAPISchemaGenerator):
     def get_schema(self, request=None, public=False):
         schema = super().get_schema(request, public)
-        schema.schemes = ["https", "http"]
+        schema.schemes = ["http", "https"]
         return schema
 
 
 def get_swagger_urls():
+    version = "v1"
+    base_url = f"api"
+
     schema_view = get_schema_view(
         openapi.Info(
-            title="Obab API",
-            default_version="v1",
+            title="initialize_django API",
+            default_version=f"{version}",
             description="initialize_django API 문서입니다.\n토큰 인증을 하실 때는 헤더에 'Token xxx' 형태로 액세스 토큰에 Token(Bearer) 접두사를 붙여주세요."
             "\n로컬에서 개발하실 때에는 하단의 HTTP 스키마를 선택해 주시고, 실제 서버에서는 HTTPS 스키마를 선택해 주세요.",
             terms_of_service="https://github.com/BackDjango/initialize_django_jongseoung",
@@ -29,17 +32,17 @@ def get_swagger_urls():
 
     return [
         path(
-            "swagger.<str:format>",
+            f"{base_url}/{version}/swagger.<str:format>",
             schema_view.without_ui(cache_timeout=0),
             name="schema-json",
         ),
         path(
-            "swagger/",
+            f"{base_url}/{version}/swagger/",
             schema_view.with_ui("swagger", cache_timeout=0),
             name="schema-swagger-ui",
         ),
         path(
-            "redoc/",
+            f"{base_url}/{version}/redoc/",
             schema_view.with_ui("redoc", cache_timeout=0),
             name="schema-redoc",
         ),

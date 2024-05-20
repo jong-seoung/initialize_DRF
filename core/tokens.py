@@ -1,7 +1,7 @@
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from users.models import User
+from api.models.users.models import User
 from core.exceptions.service_exceptions import *
 
 
@@ -12,7 +12,7 @@ class CustomJWTAuthentication(JWTAuthentication):
             return None
         raw_token = self.get_raw_token(header)
         if raw_token is None:
-            raise  JWTOutstandingNotFound
+            raise JWTOutstandingNotFound
 
         validated_token = self.get_validated_token(raw_token)
         user = self.get_user(validated_token)

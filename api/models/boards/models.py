@@ -1,7 +1,7 @@
 from django.db import models
 
 from core.models import TimeStampedModel
-from users.models import User
+from api.models.users.models import User
 
 
 class Board(TimeStampedModel):

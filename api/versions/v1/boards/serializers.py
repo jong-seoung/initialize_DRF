@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from boards.models import Board
+from api.models.boards.models import Board
 
 
 class boardsSerializers(serializers.ModelSerializer):

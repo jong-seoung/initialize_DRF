@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 
 from core.models import TimeStampedModel
-from users.managers import UserManager
+from api.models.users.managers import UserManager
 
 
 class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
