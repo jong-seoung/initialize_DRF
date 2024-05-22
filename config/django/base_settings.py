@@ -137,6 +137,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Logging
 
+DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
+LOG_FILE_NAME = "local.log" if DEBUG else "pro.log"
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -154,18 +157,12 @@ LOGGING = {
         },
     },
     "handlers": {
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "filters": ["require_debug_true"],
-            "formatter": "standard",
-        },
+        "console": {"level": "INFO", "class": "logging.StreamHandler"},
         "file": {
-            "level": "DEBUG",
+            "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
             # 'class': 'logging.handlers.TimedRotatingFileHandler',
-            "filename": os.path.join(BASE_DIR, "logs/app.log"),
-            "filters": ["require_debug_false"],
+            "filename": os.path.join(BASE_DIR, f"logs/{LOG_FILE_NAME}"),
             "maxBytes": 1024 * 1024 * 5,
             "backupCount": 5,
             # 'when': 'midnight',
@@ -189,6 +186,5 @@ LOGGING = {
     "loggers": {
         "": {"handlers": ["console", "file", "error_file"], "level": "DEBUG", "propagate": True},
         "django": {"handlers": ["console", "file", "error_file"], "level": "DEBUG", "propagate": False},
-        "django.utils.autoreload": {"handlers": ["console"], "level": "INFO", "propagate": False},
     },
 }
