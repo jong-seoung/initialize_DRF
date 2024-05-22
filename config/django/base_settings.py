@@ -10,10 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-from pathlib import Path
 import os
-import environ
 from datetime import timedelta
+from pathlib import Path
+
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -29,17 +30,9 @@ SECRET_KEY = env("SECRET_KEY")
 
 # Application definition
 
-LOCAL_APPS = [
-    "core",
-    "api.models.users",
-    "api.models.boards",
-]
+LOCAL_APPS = ["core", "api.models.users", "api.models.boards"]
 
-THIRD_PARTY_APPS = [
-    "rest_framework",
-    "rest_framework_simplejwt",
-    "drf_yasg",
-]
+THIRD_PARTY_APPS = ["rest_framework", "rest_framework_simplejwt", "drf_yasg"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -75,9 +68,9 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-            ],
+            ]
         },
-    },
+    }
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
@@ -87,18 +80,10 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 
@@ -127,9 +112,7 @@ STATIC_URL = "static/"
 
 # RestFramework
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
     # Response class include renderer method
     # "DEFAULT_RENDERER_CLASSES": [
     #     "core.renderers.CustomRenderer",
@@ -150,3 +133,62 @@ SIMPLE_JWT = {
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# Logging
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_true": {"()": "django.utils.log.RequireDebugTrue"},
+        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
+    },
+    "formatters": {
+        "standard": {"format": "{asctime} [{levelname}] {name} {message}", "style": "{"},
+        "django.server": {
+            "format": "{asctime} [{levelname}] {name} {message} \n"
+            "\t[PID: {process} - {processName}] | [TID: {thread} - {threadName}]",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "filters": ["require_debug_true"],
+            "formatter": "standard",
+        },
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            # 'class': 'logging.handlers.TimedRotatingFileHandler',
+            "filename": os.path.join(BASE_DIR, "logs/app.log"),
+            "filters": ["require_debug_false"],
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            # 'when': 'midnight',
+            # 'interval': 1,
+            # 'backupCount': 7,
+            "formatter": "standard",
+        },
+        "error_file": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            # 'class': 'logging.handlers.TimedRotatingFileHandler',
+            "filename": os.path.join(BASE_DIR, "logs/errors.log"),
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            # 'when': 'midnight',
+            # 'interval': 1,
+            # 'backupCount': 7,
+            "formatter": "django.server",
+        },
+    },
+    "loggers": {
+        "": {"handlers": ["console", "file", "error_file"], "level": "DEBUG", "propagate": True},
+        "django": {"handlers": ["console", "file", "error_file"], "level": "DEBUG", "propagate": False},
+        "django.utils.autoreload": {"handlers": ["console"], "level": "INFO", "propagate": False},
+    },
+}
