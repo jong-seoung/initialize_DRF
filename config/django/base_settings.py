@@ -32,7 +32,12 @@ SECRET_KEY = env("SECRET_KEY")
 
 LOCAL_APPS = ["core", "api.models.users", "api.models.boards"]
 
-THIRD_PARTY_APPS = ["rest_framework", "rest_framework_simplejwt", "drf_yasg"]
+THIRD_PARTY_APPS = [
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    "drf_yasg",
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -112,13 +117,15 @@ STATIC_URL = "static/"
 
 # RestFramework
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
+    "DEFAULT_AUTHENTICATION_CLASSES": ("core.middlewares.CustomJWTAuthentication",),
     # Response class include renderer method
     # "DEFAULT_RENDERER_CLASSES": [
     #     "core.renderers.CustomRenderer",
     # ],
     "DEFAULT_PAGINATION_CLASS": "core.paginations.CustomPagination",
 }
+
+AUTHENTICATION_BACKENDS = ("core.backends.CustomJWTBackend",)
 
 # djangorestframework-simplejwt
 REST_USE_JWT = True
