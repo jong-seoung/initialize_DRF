@@ -20,7 +20,7 @@ class CustomJWTBackend(JWTAuthentication):
         """
         _params = {
             self.user_model().USERNAME_FIELD: (
-                credentials.get(self.user_model().USERNAME_FIELD) or credentials.get("username")
+                credentials.get(self.user_model().USERNAME_FIELD) or credentials.get("email")
             )
         }
         user = User.objects.filter(**_params, is_active=True).first()
