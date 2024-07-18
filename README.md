@@ -1,4 +1,4 @@
-# initialize_django_jongseoung
+# initialize_DRF
 
 ## 소개
 
